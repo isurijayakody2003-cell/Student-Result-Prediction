@@ -1,0 +1,281 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Result Prediction System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 15px;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 550px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            background: #1d4ed8;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0 0 10px;
+            font-size: 27px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #dbeafe;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        h2 {
+            color: #1e40af;
+            font-size: 21px;
+            margin-top: 0;
+        }
+
+        .description {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px #dbeafe;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1e40af;
+        }
+
+        .result-card {
+            margin-top: 25px;
+            padding: 22px;
+            border-radius: 10px;
+            text-align: center;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+        }
+
+        .result-card h2 {
+            margin-bottom: 12px;
+        }
+
+        .prediction {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .pass {
+            color: #15803d;
+        }
+
+        .fail {
+            color: #dc2626;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 8px;
+            background: #fee2e2;
+            color: #991b1b;
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 18px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 500px) {
+            .content {
+                padding: 22px;
+            }
+
+            .header h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <h1>Student Result Prediction</h1>
+            <p>Machine Learning Based Prediction System</p>
+        </header>
+
+        <main class="content">
+
+            <h2>Enter Student Marks</h2>
+
+            <p class="description">
+                Enter the student's attendance and assessment marks
+                below to predict the result.
+            </p>
+
+            <form action="/predict" method="POST">
+
+                <div class="form-group">
+                    <label for="attendance">Attendance (%)</label>
+                    <input
+                        type="number"
+                        id="attendance"
+                        name="attendance"
+                        min="0"
+                        max="100"
+                        step="any"
+                        value="{{ attendance if attendance is defined else '' }}"
+                        placeholder="Enter attendance (0–100)"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="assignment">Assignment Marks</label>
+                    <input
+                        type="number"
+                        id="assignment"
+                        name="assignment"
+                        min="0"
+                        max="100"
+                        step="any"
+                        value="{{ assignment if assignment is defined else '' }}"
+                        placeholder="Enter assignment marks"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="quiz">Quiz Marks</label>
+                    <input
+                        type="number"
+                        id="quiz"
+                        name="quiz"
+                        min="0"
+                        max="100"
+                        step="any"
+                        value="{{ quiz if quiz is defined else '' }}"
+                        placeholder="Enter quiz marks"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="mid_exam">Mid Exam Marks</label>
+                    <input
+                        type="number"
+                        id="mid_exam"
+                        name="mid_exam"
+                        min="0"
+                        max="100"
+                        step="any"
+                        value="{{ mid_exam if mid_exam is defined else '' }}"
+                        placeholder="Enter mid exam marks"
+                        required
+                    >
+                </div>
+
+                <button type="submit">
+                    Predict Student Result
+                </button>
+
+            </form>
+
+            {% if prediction is defined %}
+
+            <div class="result-card">
+                <h2>Prediction Result</h2>
+
+                <p>Your predicted student result is:</p>
+
+                <div class="prediction {{ 'pass' if prediction|string|lower == 'pass' else 'fail' }}">
+                    {{ prediction }}
+                </div>
+            </div>
+
+            {% endif %}
+
+            {% if error %}
+                <div class="error">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+        </main>
+
+        <footer class="footer">
+            Student Result Prediction System | Machine Learning Assignment
+        </footer>
+
+    </div>
+
+</body>
+</html>
